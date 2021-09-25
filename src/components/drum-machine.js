@@ -120,10 +120,13 @@ class DrumMachine extends React.Component {
     this.state = {
       playing: String.fromCharCode(160),
       power: true,
+      volume: 5,
     };
     this.playRef = React.createRef();
     this.playAudio = this.playAudio.bind(this);
     this.power = this.power.bind(this);
+    this.handleVolume = this.handleVolume.bind(this);
+    this.clearPlaying = this.clearPlaying.bind(this);
   }
   playAudio(val) {
     if (this.state.power === true) {
@@ -157,15 +160,25 @@ class DrumMachine extends React.Component {
       return { power: !state.power, playing: String.fromCharCode(160) };
     });
   }
+  handleVolume(e) {
+    this.playRef.current.volume = e.target.value;
+    if (this.state.power) {
+      this.setState({
+        volume: e.target.value,
+        playing: `Volume ${Math.round(e.target.value * 100)}`,
+      });
+      setTimeout(this.clearPlaying, 1000);
+    }
+  }
+  clearPlaying() {
+    this.setState({ playing: String.fromCharCode(160) });
+  }
   render() {
     return (
-      <div id="drum-machine" className="container-fluid border border-info">
-        <audio ref={this.playRef}></audio>
-        <div className="row border border-info">
-          <div
-            className="row border py-1 col-3"
-            // style={{ gap: "1px" }}
-          >
+      <div id="drum-machine" className="container-fluid ">
+        <audio id="audio" ref={this.playRef} />
+        <div className="row border container">
+          <div className="row border py-1 col-3">
             {bankOne.map((val, i, audioArr) => {
               return (
                 <ButtonPlayer
@@ -177,13 +190,29 @@ class DrumMachine extends React.Component {
               );
             })}
           </div>
-          <div className="col-2 border">
+          <div className="col-2 ">
             <DisplayAudio currentAudio={this.state.playing} />
-            <PowerButton power={this.power} turnOn={this.state.power?"bg-success":"bg-white"}/>
+            <div>
+              <label for="customRange2" class="form-label h5">
+                Volume Slider
+              </label>
+              <input
+                type="range"
+                class="form-range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={this.state.volume}
+                onChange={this.handleVolume}
+              />
+            </div>
+            <PowerButton
+              power={this.power}
+              turnOn={this.state.power ? "bg-success" : "bg-white"}
+              turnOff={!this.state.power ? "bg-danger" : "bg-white"}
+            />
           </div>
         </div>
-        {/* <DisplayAudio currentAudio={this.state.playing} />
-        <PowerButton power={this.power} /> */}
       </div>
     );
   }
@@ -210,7 +239,7 @@ class ButtonPlayer extends React.Component {
 
 function DisplayAudio(props) {
   return (
-    <div className="bg-dark text-white text-center">
+    <div className="bg-dark text-white text-center shadow">
       <div>{props.currentAudio}</div>
     </div>
   );
@@ -218,15 +247,15 @@ function DisplayAudio(props) {
 function PowerButton(props) {
   return (
     <div
-      className={`power-button p-1 rounded d-inline-flex border`}
+      className={`power-button p-1 rounded d-inline-flex border shadow`}
       onClick={props.power}
       style={{ cursor: "pointer" }}
     >
-      <div className={`text-center ${prop.turnOn} p-2`}>
-        {String.fromCharCode(160)}
+      <div className={`text-center ${props.turnOn} p-2`}>
+        {String.fromCharCode(160)}ON
       </div>
       <div className={`text-center ${props.turnOff} p-2 `}>
-        {String.fromCharCode(160)}
+        {String.fromCharCode(160)}OFF
       </div>
     </div>
   );

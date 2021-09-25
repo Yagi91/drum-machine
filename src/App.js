@@ -5,7 +5,7 @@ import "./App.css";
 function App() {
   return (
     <div className="App">
-      <div>You can press the keys on the keyboard to play the sound</div>
+      <div>You can press the keys on the keyboard to play Audio</div>
       <DrumMachine />
     </div>
   );
